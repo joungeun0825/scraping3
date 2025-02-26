@@ -15,7 +15,7 @@ public class GookminApplication {
         char[] pw = password.toCharArray();
         InputManager.getInputPage(keyPad);
         System.out.println("result hash: " + PasswordManager.savePassword(keyPad, pw));
-        ResultManager.getResult(PasswordManager.savePassword(keyPad, pw));
-
+        String result = ResultManager.getResult(PasswordManager.savePassword(keyPad, pw));
+        ResultParser.parse(result);
     }
 }
