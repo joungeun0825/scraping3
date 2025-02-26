@@ -1,14 +1,19 @@
-package scraping.gookmin;
+package scraping.gookmin.service;
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import scraping.gookmin.util.CookieUtil;
+import scraping.gookmin.util.Decoder;
+import scraping.gookmin.util.Key;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@RequiredArgsConstructor
+@Service
 public class InputManager {
     private static final RestClient restClient = RestClient.builder()
             .baseUrl("https://obank.kbstar.com")
@@ -29,19 +34,18 @@ public class InputManager {
     private static final String NAME_REGEX = "USEYN_CHECK_NAME_([a-zA-Z0-9]+)";
     private static final String SRC_REGEX = "src=\"([^\"]+)\"";
 
-    public static void getInputPage(Key keyPad) {
+    public void getInputPage(Key keyPad) {
         ResponseEntity<String> response = requestInputPage();  // 응답 본문을 String으로 변환
 
         sessionCookie = CookieUtil.getCookie(response);
         getUserId(response);
         getName(response);
         String decodedJavascript = getPasswordJavascript(response);
-        System.out.println(decodedJavascript);
         savePasswordKey(decodedJavascript, keyPad);
         getImageUrl(decodedJavascript);
     }
 
-    private static ResponseEntity<String> requestInputPage() {
+    private ResponseEntity<String> requestInputPage() {
         return restClient.get()
                 .uri("/quics?page=C025255&cc=b028364:b028702&QSL=F")  // 상대경로만 작성
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
@@ -54,7 +58,7 @@ public class InputManager {
                 .toEntity(String.class);
     }
 
-    private static void getName(ResponseEntity<String> response) {
+    private void getName(ResponseEntity<String> response) {
         Pattern pattern = Pattern.compile(NAME_REGEX);
         Matcher matcher = pattern.matcher(response.getBody());
 
@@ -67,7 +71,7 @@ public class InputManager {
         }
     }
 
-    private static String getPasswordJavascript(ResponseEntity<String> response) {
+    private String getPasswordJavascript(ResponseEntity<String> response) {
         Pattern pattern = Pattern.compile(HEX2BIN_REGEX);
         Matcher matcher = pattern.matcher(response.getBody());
         if (matcher.find()) {
@@ -78,9 +82,7 @@ public class InputManager {
         throw new IllegalArgumentException("can not found vKpd.hex2bin()");
     }
 
-    private static void getImageUrl(String decodedJavascript) {
-        // 정규식: src="..." 형태의 값을 찾음
-        String SRC_REGEX = "src=\"([^\"]+)\"";
+    private void getImageUrl(String decodedJavascript) {
         Pattern pattern = Pattern.compile(SRC_REGEX);
         Matcher matcher = pattern.matcher(decodedJavascript);
 
@@ -95,15 +97,13 @@ public class InputManager {
             }
         }
 
-        if (imageUrl != null) {
-            System.out.println("Second Image URL: " + imageUrl);
-        } else {
+        if (imageUrl == null) {
             System.out.println("Second Image URL not found");
             throw new IllegalArgumentException("Can not found second image url");
         }
     }
 
-    private static void getUserId(ResponseEntity<String> response) {
+    private void getUserId(ResponseEntity<String> response) {
         Pattern pattern2 = Pattern.compile(ID_REGEX);
         Matcher matcher2 = pattern2.matcher(response.getBody());
 
@@ -113,7 +113,7 @@ public class InputManager {
         }
     }
 
-    private static void savePasswordKey(String response, Key keyPad) {
+    private void savePasswordKey(String response, Key keyPad) {
         Pattern pattern = Pattern.compile(PASSWORD_REGEX);
         Matcher matcher = pattern.matcher(response);
 

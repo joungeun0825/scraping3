@@ -1,4 +1,6 @@
-package scraping.gookmin;
+package scraping.gookmin.util;
+
+import scraping.gookmin.dto.RequestDto;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -6,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Map;
 
 public class ImageSlicer {
     public static void saveImage(byte[] imageBytes, String fileName) {
@@ -17,7 +18,7 @@ public class ImageSlicer {
         }
     }
 
-    public static String slice(byte[] imageBytes, Key keypad, char[] password) {
+    public static String slice(byte[] imageBytes, Key keypad, RequestDto requestDto) {
         StringBuilder hash = new StringBuilder();
 
         saveImage(imageBytes, "image.png");
@@ -69,7 +70,7 @@ public class ImageSlicer {
                 }
             }
 
-            for(char pw : password) {
+            for(char pw : requestDto.getPassword().toCharArray()) {
                 hash.append(keypad.getHash(pw - '0'));
             }
 
@@ -145,14 +146,5 @@ public class ImageSlicer {
         int[] pixels = new int[width * height];
         image.getRGB(0, 0, width, height, pixels, 0, width);
         return pixels;
-    }
-
-    // Map에 저장된 픽셀 데이터 출력
-    private static void printPixelMap(Map<Integer, int[]> pixelMap) {
-        int count = 1;
-        for (Map.Entry<Integer, int[]> entry : pixelMap.entrySet()) {
-            int[] pixels = entry.getValue();
-            System.out.println("이미지 " + entry.getKey() + " -> 픽셀 수: " + pixels.length);
-        }
     }
 }

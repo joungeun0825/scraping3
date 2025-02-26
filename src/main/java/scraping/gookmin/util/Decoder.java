@@ -1,4 +1,4 @@
-package scraping.gookmin;
+package scraping.gookmin.util;
 
 public class Decoder {
     public static String hexToString(String hex) {

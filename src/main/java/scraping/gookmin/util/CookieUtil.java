@@ -1,4 +1,4 @@
-package scraping.gookmin;
+package scraping.gookmin.util;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;

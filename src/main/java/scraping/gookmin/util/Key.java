@@ -1,4 +1,4 @@
-package scraping.gookmin;
+package scraping.gookmin.util;
 
 import java.util.HashMap;
 import java.util.Map;

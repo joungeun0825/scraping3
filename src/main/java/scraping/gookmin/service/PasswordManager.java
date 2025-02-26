@@ -1,14 +1,21 @@
-package scraping.gookmin;
+package scraping.gookmin.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import scraping.gookmin.dto.RequestDto;
+import scraping.gookmin.util.ImageSlicer;
+import scraping.gookmin.util.Key;
 
+@RequiredArgsConstructor
+@Service
 public class PasswordManager {
-    private static final RestClient restClient = RestClient.builder()
+    private final RestClient restClient = RestClient.builder()
             .baseUrl("https://obank.kbstar.com")
             .build();
 
-    public static String savePassword(Key keyPad, char[] pw) {
+    public String savePassword(Key keyPad, RequestDto requestDto) {
         ResponseEntity<byte[]> response2 = restClient.get()
                 .uri(InputManager.getImageUrl())
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
@@ -23,7 +30,7 @@ public class PasswordManager {
 
         // 이미지 데이터 HEX 변환 및 저장
         if (response2.hasBody()) {
-            return ImageSlicer.slice(response2.getBody(), keyPad, pw);
+            return ImageSlicer.slice(response2.getBody(), keyPad, requestDto);
         }
         throw new IllegalArgumentException("이미지 데이터 없음.");
     }
