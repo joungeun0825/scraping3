@@ -8,7 +8,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import scraping.gookmin.CentralStorage;
 import scraping.gookmin.FormDataExtractor;
-import scraping.gookmin.util.CookieUtil;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service

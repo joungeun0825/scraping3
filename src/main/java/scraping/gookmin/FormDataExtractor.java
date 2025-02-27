@@ -23,7 +23,6 @@ public class FormDataExtractor {
         Document doc = Jsoup.parse(result);
         Element form = doc.selectFirst("form");
         Elements scripts = doc.select("script");
-
         if (form != null) {
             Elements inputs = form.select("input");
             AccountInfo accountInfo = new AccountInfo(
@@ -49,11 +48,7 @@ public class FormDataExtractor {
                     getInputValue(inputs, "조회끝월"),
                     getInputValue(inputs, "조회끝일")
             );
-            if(CentralStorage.containsKey(userId)){
-                System.out.println("Before saving: " + CentralStorage.getInfo(userId));
-            }
             CentralStorage.saveUserInfo(userId, accountInfo);
-            System.out.println("After saving: " + CentralStorage.getInfo(userId));
 
         } else {
             System.out.println("Form not found!");

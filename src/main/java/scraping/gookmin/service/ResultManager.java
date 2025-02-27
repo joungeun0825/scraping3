@@ -35,7 +35,7 @@ public class ResultManager {
                 .toEntity(String.class);
 
         if (response2.hasBody()) {
-            FormDataExtractor.extractAndSaveFormData(requestDto.getUserNumber(), response2.getBody(), null);
+            FormDataExtractor.extractAndSaveFormData(requestDto.getUserNumber(), response2.getBody());
             return response2.getBody();
         }
         throw new IllegalArgumentException("Invalid Result");

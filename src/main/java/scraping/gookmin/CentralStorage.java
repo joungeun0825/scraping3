@@ -33,6 +33,7 @@ public class CentralStorage {
     public static MultiValueMap<String, String> getInfo(String userId) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         AccountInfo accountInfo = centralUserInfo.get(userId).getLast();
+
         formData.add("lastReqTime", accountInfo.getLastReqTime());
         formData.add("signed_msg", accountInfo.getSignedMsg());
         formData.add("요청키", accountInfo.getReqKey());
