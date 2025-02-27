@@ -17,7 +17,7 @@ import java.util.List;
 public class ResponseDto {
     private Long id;
     private String dateRange;
-    private String accountInfo;
+    private String accountNumber;
     private String totalBalance;
     private String withDrawableBalance;
     private String loanAmount;
@@ -28,7 +28,7 @@ public class ResponseDto {
     public ResponseDto(String dateRange, Account account, List<TransactionHistory> histories) {
         this.id = account.getId();
         this.dateRange = dateRange;
-        this.accountInfo = account.getAccountInfo();
+        this.accountNumber = account.getAccountNumber();
         this.totalBalance = account.getTotalBalance();
         this.withDrawableBalance = account.getWithDrawableBalance();
         this.loanAmount = account.getLoanAmount();

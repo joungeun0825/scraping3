@@ -6,10 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import scraping.gookmin.dto.RequestDto;
 import scraping.gookmin.dto.ResponseDto;
-import scraping.gookmin.service.InputManager;
-import scraping.gookmin.service.PasswordManager;
-import scraping.gookmin.service.ResultManager;
-import scraping.gookmin.service.ResultParser;
+import scraping.gookmin.service.*;
 import scraping.gookmin.util.Key;
 
 @RestController
@@ -20,12 +17,19 @@ public class AccountController {
     private final PasswordManager passwordManager;
     private final ResultManager resultManager;
     private final ResultParser resultParser;
+    private final NextPageRequestService nextPageRequestService;
 
     @PostMapping
-    public ResponseEntity<ResponseDto> getOrderList(@RequestBody RequestDto requestBody) {
+    public ResponseEntity<ResponseDto> getAccount(@RequestBody RequestDto requestBody) {
         Key keyPad = new Key();
         inputManager.getInputPage(keyPad);
         String result = resultManager.getResult(passwordManager.savePassword(keyPad, requestBody), requestBody);
         return ResponseEntity.status(HttpStatus.CREATED).body(resultParser.parse(result));
+    }
+
+    @GetMapping
+    public ResponseEntity<String> getNextPage(@RequestParam String userId) {
+        String result = nextPageRequestService.getNextPage(userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 }

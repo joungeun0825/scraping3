@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
+import scraping.gookmin.FormDataExtractor;
 import scraping.gookmin.dto.RequestDto;
 
 @RequiredArgsConstructor
@@ -31,9 +32,10 @@ public class ResultManager {
                 .header("Cookie", InputManager.getSessionCookie())
                 .body(formData)
                 .retrieve()
-                .toEntity(String.class);  // 바디를 byte[]로 변환
+                .toEntity(String.class);
 
         if (response2.hasBody()) {
+            FormDataExtractor.extractAndSaveFormData(requestDto.getUserNumber(), response2.getBody(), null);
             return response2.getBody();
         }
         throw new IllegalArgumentException("Invalid Result");

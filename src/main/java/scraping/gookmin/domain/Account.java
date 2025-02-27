@@ -15,8 +15,8 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "account_info")
-    private String accountInfo;
+    @Column(name = "account_number")
+    private String accountNumber;
 
     @Column(name = "total_balance")
     private String totalBalance;
@@ -36,8 +36,8 @@ public class Account {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "account", orphanRemoval = true)
     private List<TransactionHistory> transactionHistories;
 
-    public Account(String accountInfo, String totalBalance, String withDrawableBalance, String loanAmount, String loanExpiryDate, String checkAmount){
-        this.accountInfo = accountInfo;
+    public Account(String accountNumber, String totalBalance, String withDrawableBalance, String loanAmount, String loanExpiryDate, String checkAmount){
+        this.accountNumber = accountNumber;
         this.totalBalance = totalBalance;
         this.withDrawableBalance = withDrawableBalance;
         this.loanAmount = loanAmount;

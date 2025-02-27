@@ -2,6 +2,7 @@ package scraping.gookmin.service;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -20,6 +21,7 @@ public class InputManager {
             .build();
 
     @Getter
+    @Setter
     private static String sessionCookie;
     @Getter
     private static String userId;
