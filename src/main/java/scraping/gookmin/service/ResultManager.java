@@ -7,17 +7,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
-import scraping.gookmin.FormDataExtractor;
+import scraping.gookmin.util.FormDataExtractor;
+import scraping.gookmin.domain.Account;
+import scraping.gookmin.domain.TransactionHistory;
 import scraping.gookmin.dto.RequestDto;
+import scraping.gookmin.dto.ResponseDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class ResultManager {
+    private final ResultParser resultParser;
     private final RestClient restClient = RestClient.builder()
             .baseUrl("https://obank.kbstar.com")
             .build();
 
-    public String getResult(String hash, RequestDto requestDto) {
+    public ResponseDto getResult(String hash, RequestDto requestDto) {
         MultiValueMap<String, String> formData = getFormData(hash, requestDto);
 
         ResponseEntity<String> response2 = restClient.post()
@@ -34,10 +41,31 @@ public class ResultManager {
                 .retrieve()
                 .toEntity(String.class);
 
+        List<TransactionHistory> histories = resultParser.parseTransactionHistory(new ArrayList<>(), response2.getBody());
+        MultiValueMap<String, String> newFormData = FormDataExtractor.extractAndSaveFormData(requestDto.getUserNumber(), response2.getBody());
+
         if (response2.hasBody()) {
-            FormDataExtractor.extractAndSaveFormData(requestDto.getUserNumber(), response2.getBody());
-            return response2.getBody();
+            for (int i = 0; i < 8; i++) {
+                ResponseEntity<String> newResponse = restClient.post()
+                        .uri("/quics?chgCompId=b028770&baseCompId=b028702&page=C025255&cc=b028702:b028770")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+                        .header("Accept", "text/html, */*")
+                        .header("Accept-Encoding", "gzip, deflate, br, zstd")
+                        .header("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7")
+                        .header("Referer", "https://obank.kbstar.com/quics?page=C025255&cc=b028364:b028702&QSL=F")
+                        .header("Connection", "keep-alive")
+                        .header("Cookie", InputManager.getSessionCookie())
+                        .body(newFormData)
+                        .retrieve()
+                        .toEntity(String.class);
+                histories = resultParser.parseTransactionHistory(histories, newResponse.getBody());
+                newFormData = FormDataExtractor.extractAndSaveFormData(requestDto.getUserNumber(), newResponse.getBody());
+            }
+            Account account = resultParser.parseAccount(response2.getBody());
+            return new ResponseDto(resultParser.getDateRange(response2.getBody()), account, histories);
         }
+
         throw new IllegalArgumentException("Invalid Result");
     }
 

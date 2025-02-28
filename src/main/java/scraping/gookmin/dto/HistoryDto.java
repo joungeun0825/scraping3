@@ -8,7 +8,6 @@ import scraping.gookmin.domain.TransactionHistory;
 @Setter
 @ToString
 public class HistoryDto {
-    private Long id;
     private String transactionDate;
     private String description;
     private String accountContent;
@@ -19,7 +18,6 @@ public class HistoryDto {
     private String client;
 
     public HistoryDto(TransactionHistory  transactionHistory) {
-        this.id = transactionHistory.getId();
         this.transactionDate = transactionHistory.getTransactionDate();
         this.description = transactionHistory.getDescription();
         this.accountContent = transactionHistory.getAccountContent();

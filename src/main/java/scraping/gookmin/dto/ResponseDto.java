@@ -15,7 +15,6 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class ResponseDto {
-    private Long id;
     private String dateRange;
     private String accountNumber;
     private String totalBalance;
@@ -26,7 +25,6 @@ public class ResponseDto {
     private List<HistoryDto> transactionHistories = new ArrayList<>();
 
     public ResponseDto(String dateRange, Account account, List<TransactionHistory> histories) {
-        this.id = account.getId();
         this.dateRange = dateRange;
         this.accountNumber = account.getAccountNumber();
         this.totalBalance = account.getTotalBalance();

@@ -16,20 +16,12 @@ public class AccountController {
     private final InputManager inputManager;
     private final PasswordManager passwordManager;
     private final ResultManager resultManager;
-    private final ResultParser resultParser;
-    private final NextPageRequestService nextPageRequestService;
 
     @PostMapping
     public ResponseEntity<ResponseDto> getAccount(@RequestBody RequestDto requestBody) {
         Key keyPad = new Key();
         inputManager.getInputPage(keyPad);
-        String result = resultManager.getResult(passwordManager.savePassword(keyPad, requestBody), requestBody);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resultParser.parse(result));
-    }
-
-    @GetMapping
-    public ResponseEntity<String> getNextPage(@RequestParam String userId) {
-        String result = nextPageRequestService.getNextPage(userId);
+        ResponseDto result = resultManager.getResult(passwordManager.savePassword(keyPad, requestBody), requestBody);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 }

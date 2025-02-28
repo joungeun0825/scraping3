@@ -1,4 +1,4 @@
-package scraping.gookmin;
+package scraping.gookmin.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import scraping.gookmin.domain.AccountInfo;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,8 +19,7 @@ public class FormDataExtractor {
     private static final String STR_NEXT_YM = "var\\s+strNextYM\\s*=\\s*[\"'](.*?)[\"'];";
     private static final String STR_NEXT_SEQ = "var\\s+strNextSeq\\s*=\\s*[\"'](.*?)[\"'];";
 
-    public static void extractAndSaveFormData(String userId, String result) {
-        System.out.println(result);
+    public static MultiValueMap<String, String> extractAndSaveFormData(String userId, String result) {
         Document doc = Jsoup.parse(result);
         Element form = doc.selectFirst("form");
         Elements scripts = doc.select("script");
@@ -48,11 +48,39 @@ public class FormDataExtractor {
                     getInputValue(inputs, "조회끝월"),
                     getInputValue(inputs, "조회끝일")
             );
-            CentralStorage.saveUserInfo(userId, accountInfo);
+            return getInfo(userId, accountInfo);
 
-        } else {
-            System.out.println("Form not found!");
         }
+        throw new IllegalArgumentException("Form not found!");
+    }
+
+    public static MultiValueMap<String, String> getInfo(String userId, AccountInfo accountInfo) {
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+
+        formData.add("lastReqTime", accountInfo.getLastReqTime());
+        formData.add("signed_msg", accountInfo.getSignedMsg());
+        formData.add("요청키", accountInfo.getReqKey());
+        formData.add("계좌번호", accountInfo.getAccountNumber());
+        formData.add("조회시작일자", accountInfo.getStartYear()+accountInfo.getStartMonth()+accountInfo.getStartDay());
+        formData.add("조회종료일", accountInfo.getEndYear()+accountInfo.getEndMonth()+accountInfo.getEndDay());
+        formData.add("주민사업자번호", userId);
+        formData.add("고객식별번호", accountInfo.getUserNumber());
+        formData.add("빠른조회", "Y");
+        formData.add("s_pageKeyValue", accountInfo.getSPageKeyValue());
+        formData.add("s_presentNum", accountInfo.getSPresentNum());
+        formData.add("다음거래년월일키", accountInfo.getNextDateKey());
+        formData.add("다음거래일련번호키", accountInfo.getNextSerialNumKey());
+        formData.add("이전다음거래년월일키", accountInfo.getBeforeNextDateKey());
+        formData.add("이전다음거래일련번호키", accountInfo.getBeforeNextSerialNumKey());
+        formData.add("조회시작년", accountInfo.getStartYear());
+        formData.add("조회시작월", accountInfo.getStartMonth());
+        formData.add("조회시작일", accountInfo.getStartDay());
+        formData.add("조회끝년", accountInfo.getEndYear());
+        formData.add("조회끝월", accountInfo.getEndMonth());
+        formData.add("조회끝일", accountInfo.getEndDay());
+        formData.add("조회구분", "2");
+        formData.add("응답방법", "2");
+        return formData;
     }
 
     private static String getInputValue(Elements inputs, String name) {
@@ -69,21 +97,8 @@ public class FormDataExtractor {
         Matcher matcher = pattern.matcher(scripts.html());
         if (matcher.find()) {
             String value = matcher.group(1);
-            System.out.println("Value: " + value);
             return value;
         }
         throw new IllegalArgumentException("cannot find value");
-    }
-
-    private static MultiValueMap<String, String> extractFormData(Element form) {
-        Elements inputs = form.select("input");
-        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-
-        for (Element input : inputs) {
-            String name = input.attr("name");
-            String value = input.attr("value");
-            formData.add(name, value);
-        }
-        return formData;
     }
 }

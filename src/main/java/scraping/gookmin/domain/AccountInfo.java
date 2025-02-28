@@ -1,9 +1,8 @@
-package scraping.gookmin;
+package scraping.gookmin.domain;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.util.MultiValueMap;
 
 @Getter
 @AllArgsConstructor
