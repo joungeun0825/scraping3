@@ -11,9 +11,7 @@ import scraping.gookmin.util.Key;
 @RequiredArgsConstructor
 @Service
 public class PasswordManager {
-    private final RestClient restClient = RestClient.builder()
-            .baseUrl("https://obank.kbstar.com")
-            .build();
+    private final RestClient restClient;
 
     public String savePassword(Key keyPad, RequestDto requestDto) {
         ResponseEntity<byte[]> response2 = restClient.get()

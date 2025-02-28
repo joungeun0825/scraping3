@@ -16,9 +16,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Service
 public class InputManager {
-    private static final RestClient restClient = RestClient.builder()
-            .baseUrl("https://obank.kbstar.com")
-            .build();
+    private final RestClient restClient;
 
     @Getter
     @Setter
