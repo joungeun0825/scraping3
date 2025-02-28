@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
-public class InputManager {
+public class InfoExtractor {
     private final RestClient restClient;
 
     @Getter
@@ -34,15 +34,15 @@ public class InputManager {
     private static final String NAME_REGEX = "USEYN_CHECK_NAME_([a-zA-Z0-9]+)";
     private static final String SRC_REGEX = "src=\"([^\"]+)\"";
 
-    public void getInputPage(Key keyPad) {
+    public void extract(Key keyPad) {
         ResponseEntity<String> response = requestInputPage();  // 응답 본문을 String으로 변환
-
         sessionCookie = CookieUtil.getCookie(response);
-        getUserId(response);
-        getName(response);
-        String decodedJavascript = getPasswordJavascript(response);
+
+        extractUserId(response);
+        extractUserName(response);
+        String decodedJavascript = extractPasswordInfoJavascript(response);
         savePasswordKey(decodedJavascript, keyPad);
-        getImageUrl(decodedJavascript);
+        extractKeyPadImageUrl(decodedJavascript);
     }
 
     private ResponseEntity<String> requestInputPage() {
@@ -58,7 +58,17 @@ public class InputManager {
                 .toEntity(String.class);
     }
 
-    private void getName(ResponseEntity<String> response) {
+    private void extractUserId(ResponseEntity<String> response) {
+        Pattern pattern2 = Pattern.compile(ID_REGEX);
+        Matcher matcher2 = pattern2.matcher(response.getBody());
+
+        while (matcher2.find()) {
+            String extractedValue = matcher2.group(1);  // 작은 따옴표 포함된 전체 값
+            userId = extractedValue;
+        }
+    }
+
+    private void extractUserName(ResponseEntity<String> response) {
         Pattern pattern = Pattern.compile(NAME_REGEX);
         Matcher matcher = pattern.matcher(response.getBody());
 
@@ -71,7 +81,7 @@ public class InputManager {
         }
     }
 
-    private String getPasswordJavascript(ResponseEntity<String> response) {
+    private String extractPasswordInfoJavascript(ResponseEntity<String> response) {
         Pattern pattern = Pattern.compile(HEX2BIN_REGEX);
         Matcher matcher = pattern.matcher(response.getBody());
         if (matcher.find()) {
@@ -82,7 +92,20 @@ public class InputManager {
         throw new IllegalArgumentException("can not found vKpd.hex2bin()");
     }
 
-    private void getImageUrl(String decodedJavascript) {
+    private void savePasswordKey(String decodedJavascript, Key keyPad) {
+        Pattern pattern = Pattern.compile(PASSWORD_REGEX);
+        Matcher matcher = pattern.matcher(decodedJavascript);
+
+        int count = 1;
+
+        // 값 추출 후 Map에 저장
+        while (matcher.find()) {
+            String extractedValue = matcher.group(1); // 작은 따옴표 제외한 값
+            keyPad.saveHashes(count++, extractedValue);
+        }
+    }
+
+    private void extractKeyPadImageUrl(String decodedJavascript) {
         Pattern pattern = Pattern.compile(SRC_REGEX);
         Matcher matcher = pattern.matcher(decodedJavascript);
 
@@ -100,29 +123,6 @@ public class InputManager {
         if (imageUrl == null) {
             System.out.println("Second Image URL not found");
             throw new IllegalArgumentException("Can not found second image url");
-        }
-    }
-
-    private void getUserId(ResponseEntity<String> response) {
-        Pattern pattern2 = Pattern.compile(ID_REGEX);
-        Matcher matcher2 = pattern2.matcher(response.getBody());
-
-        while (matcher2.find()) {
-            String extractedValue = matcher2.group(1);  // 작은 따옴표 포함된 전체 값
-            userId = extractedValue;
-        }
-    }
-
-    private void savePasswordKey(String response, Key keyPad) {
-        Pattern pattern = Pattern.compile(PASSWORD_REGEX);
-        Matcher matcher = pattern.matcher(response);
-
-        int count = 1;
-
-        // 값 추출 후 Map에 저장
-        while (matcher.find()) {
-            String extractedValue = matcher.group(1); // 작은 따옴표 제외한 값
-            keyPad.saveHashes(count++, extractedValue);
         }
     }
 }

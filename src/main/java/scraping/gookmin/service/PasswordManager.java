@@ -15,14 +15,14 @@ public class PasswordManager {
 
     public String savePassword(Key keyPad, RequestDto requestDto) {
         ResponseEntity<byte[]> response2 = restClient.get()
-                .uri(InputManager.getImageUrl())
+                .uri(InfoExtractor.getImageUrl())
                 .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
                 .header("Accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8")
                 .header("Accept-Encoding", "gzip, deflate, br, zstd")
                 .header("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7")
                 .header("Referer", "https://obank.kbstar.com/quics?page=C025255&cc=b028364:b028702&QSL=F")
                 .header("Connection", "keep-alive")
-                .header("Cookie", InputManager.getSessionCookie())
+                .header("Cookie", InfoExtractor.getSessionCookie())
                 .retrieve()
                 .toEntity(byte[].class);  // 바디를 byte[]로 변환
 

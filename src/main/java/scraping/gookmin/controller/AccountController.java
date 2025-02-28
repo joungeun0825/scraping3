@@ -13,15 +13,16 @@ import scraping.gookmin.util.Key;
 @RequestMapping("/api/account")
 @AllArgsConstructor
 public class AccountController {
-    private final InputManager inputManager;
+    private final InfoExtractor infoExtractor;
     private final PasswordManager passwordManager;
     private final ResultManager resultManager;
 
     @PostMapping
-    public ResponseEntity<ResponseDto> getAccount(@RequestBody RequestDto requestBody) {
+    public ResponseEntity<ResponseDto> getAccount(@RequestBody RequestDto requestBody, @RequestParam int page) {
         Key keyPad = new Key();
-        inputManager.getInputPage(keyPad);
-        ResponseDto result = resultManager.getResult(passwordManager.savePassword(keyPad, requestBody), requestBody);
+        infoExtractor.extract(keyPad);
+        String password = passwordManager.savePassword(keyPad, requestBody);
+        ResponseDto result = resultManager.getResult(password, requestBody, page);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 }

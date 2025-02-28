@@ -1,5 +1,6 @@
 package scraping.gookmin.util;
 
+import lombok.Getter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,7 +12,10 @@ import scraping.gookmin.domain.AccountInfo;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FormDataExtractor {
+public class NextPageFormDataExtractor {
+    @Getter
+    private static String nextSeq;
+
     private static final String STR_REQ_KEY1 = "var\\s+strReqKey1\\s*=\\s*[\"'](.*?)[\"'];";
     private static final String STR_REQ_KEY2 = "var\\s+strReqKey2\\s*=\\s*[\"'](.*?)[\"'];";
     private static final String STR_BACK_KEY1 = "var\\s+strBackKey1\\s*=\\s*[\"'](.*?)[\"'];";
@@ -48,6 +52,7 @@ public class FormDataExtractor {
                     getInputValue(inputs, "조회끝월"),
                     getInputValue(inputs, "조회끝일")
             );
+            nextSeq = accountInfo.getNextSerialNumKey();
             return getInfo(userId, accountInfo);
 
         }
