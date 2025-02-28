@@ -59,7 +59,6 @@ public class ResultManager {
                 .toEntity(String.class);
     }
 
-
     private MultiValueMap<String, String> getFormData(String hash, RequestDto requestDto) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add(String.format("KEYPAD_TYPE_%s", InputManager.getUserId()), "3");
